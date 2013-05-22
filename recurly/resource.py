@@ -254,7 +254,7 @@ class Resource(object):
         if log.isEnabledFor(logging.DEBUG):
             log.debug("HTTP/1.1 %d %s", str(resp.status_code))
             for header in resp.headers:
-                log.debug(str(header) + ' : ' + str(headers[header]))
+                log.debug(str(header) + ' : ' + str(resp.headers[header]))
             log.debug('')
 
         return resp
