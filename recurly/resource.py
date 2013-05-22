@@ -248,7 +248,7 @@ class Resource(object):
         if method in ('POST', 'PUT') and body is None:
             headers['Content-Length'] = '0'
 
-        resp = urlfetch.fetch(url=url, payload=body, method = cls._get_urlfetch_method(method), header=headers)
+        resp = urlfetch.fetch(url=url, payload=body, method = cls._get_urlfetch_method(method), headers=headers)
 
         log = logging.getLogger('recurly.http.response')
         if log.isEnabledFor(logging.DEBUG):
