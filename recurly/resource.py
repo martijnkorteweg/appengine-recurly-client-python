@@ -252,9 +252,9 @@ class Resource(object):
 
         log = logging.getLogger('recurly.http.response')
         if log.isEnabledFor(logging.DEBUG):
-            log.debug("HTTP/1.1 %d %s", resp.status, resp.reason)
-            for header in resp.msg.headers:
-                log.debug(header.rstrip('\n'))
+            log.debug("HTTP/1.1 %d %s", str(resp.status_code))
+            for header in resp.headers:
+                log.debug(str(header) + ' : ' + str(headers[header]))
             log.debug('')
 
         return resp
@@ -307,12 +307,12 @@ class Resource(object):
         (`httplib.HTTPResponse`, `xml.etree.ElementTree.Element`) tuple
         resulting from a ``GET`` request to that URL."""
         response = cls.http_request(url)
-        if response.status != 200:
+        if response.status_code != 200:
             cls.raise_http_error(response)
 
-        assert response.getheader('Content-Type').startswith('application/xml')
+        assert response.header_msg.getheader('Content-Type').startswith('application/xml')
 
-        response_xml = response.read()
+        response_xml = response.content
         logging.getLogger('recurly.http.response').debug(response_xml)
         response_doc = ElementTree.fromstring(response_xml)
 
@@ -467,16 +467,16 @@ class Resource(object):
             body = args[0] if args else None
             response = self.http_request(full_url, method, body)
 
-            if response.status == 200:
-                response_xml = response.read()
+            if response.status_code == 200:
+                response_xml = response.content
                 logging.getLogger('recurly.http.response').debug(response_xml)
                 return self.update_from_element(ElementTree.fromstring(response_xml))
-            elif response.status == 201:
-                response_xml = response.read()
+            elif response.status_code == 201:
+                response_xml = response.content
                 logging.getLogger('recurly.http.response').debug(response_xml)
                 elem = ElementTree.fromstring(response_xml)
                 return self.value_for_element(elem)
-            elif response.status == 204:
+            elif response.status_code == 204:
                 pass
             elif extra_handler is not None:
                 return extra_handler(response)
@@ -567,10 +567,10 @@ class Resource(object):
     def _update(self):
         url = self._url
         response = self.http_request(url, 'PUT', self, {'Content-Type': 'application/xml; charset=utf-8'})
-        if response.status != 200:
+        if response._code != 200:
             self.raise_http_error(response)
 
-        response_xml = response.read()
+        response_xml = response.content
         logging.getLogger('recurly.http.response').debug(response_xml)
         self.update_from_element(ElementTree.fromstring(response_xml))
 
@@ -582,13 +582,13 @@ class Resource(object):
         """Sends this `Resource` instance to the service with a
         ``POST`` request to the given URL."""
         response = self.http_request(url, 'POST', self, {'Content-Type': 'application/xml; charset=utf-8'})
-        if response.status not in (201, 204):
+        if response.status_code not in (201, 204):
             self.raise_http_error(response)
 
-        self._url = response.getheader('Location')
+        self._url = response.headers.get('Location')
 
-        if response.status == 201:
-            response_xml = response.read()
+        if response.status_code == 201:
+            response_xml = response.content
             logging.getLogger('recurly.http.response').debug(response_xml)
             self.update_from_element(ElementTree.fromstring(response_xml))
 
@@ -598,16 +598,16 @@ class Resource(object):
         url = self._url
 
         response = self.http_request(url, 'DELETE')
-        if response.status != 204:
+        if response.status_code != 204:
             self.raise_http_error(response)
 
     @classmethod
     def raise_http_error(cls, response):
         """Raise a `ResponseError` of the appropriate subclass in
         reaction to the given `httplib.HTTPResponse`."""
-        response_xml = response.read()
+        response_xml = response.content
         logging.getLogger('recurly.http.response').debug(response_xml)
-        exc_class = recurly.errors.error_class_for_http_status(response.status)
+        exc_class = recurly.errors.error_class_for_http_status(response.status_code)
         raise exc_class(response_xml)
 
     def to_element(self):
