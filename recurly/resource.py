@@ -248,7 +248,7 @@ class Resource(object):
         if method in ('POST', 'PUT') and body is None:
             headers['Content-Length'] = '0'
 
-        resp = urlfetch.fetch(url=url, payload=body, method = urlfetch[method], header=headers)
+        resp = urlfetch.fetch(url=url, payload=body, method = cls._get_urlfetch_method(method), header=headers)
 
         log = logging.getLogger('recurly.http.response')
         if log.isEnabledFor(logging.DEBUG):
@@ -629,3 +629,18 @@ class Resource(object):
                 sub_elem = self.element_for_value(attrname, value)
                 elem.append(sub_elem)
         return elem
+    def _get_urlfetch_method(self, method="GET"):
+        if method == "POST":
+            return urlfetch.POST
+        elif method == "GET":
+            return urlfetch.GET
+        elif method == 'DELETE':
+            return urlfetch.DELETE
+        elif method =='PUT':
+            return urlfetch.PUT
+        elif method =='HEAD':
+            return urlfetch.HEAD
+        elif method =='PATCH':
+            return urlfetch.PATCH
+        else:
+            raise ValueError("Method not supported by AppEngine's URL Fetch API")
