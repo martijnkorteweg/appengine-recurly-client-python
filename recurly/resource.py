@@ -629,7 +629,8 @@ class Resource(object):
                 sub_elem = self.element_for_value(attrname, value)
                 elem.append(sub_elem)
         return elem
-    def _get_urlfetch_method(self, method="GET"):
+    @staticmethod
+    def _get_urlfetch_method(method="GET"):
         if method == "POST":
             return urlfetch.POST
         elif method == "GET":
