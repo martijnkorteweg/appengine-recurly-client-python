@@ -10,6 +10,13 @@ from xml.etree import ElementTree
 
 import mock
 
+from google.appengine.api import urlfetch
+from google.appengine.api import apiproxy_stub_map
+from google.appengine.api import urlfetch_stub
+
+apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
+apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', urlfetch_stub.URLFetchServiceStub())
+
 
 def xml(text):
     doc = ElementTree.fromstring(text)
