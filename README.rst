@@ -1,15 +1,15 @@
 Recurly Python Client for Google App Engine (GAE)
 =====================
 
-This project is based on the [Recurly Python Client Library](https://github.com/recurly/recurly-client-python). It
+This project is based on the `Recurly Python Client Library <https://github.com/recurly/recurly-client-python`_ It
 replaces calls to _ssl and httplib2 with calls to Google App Engine's
-[URL Fetch API](https://developers.google.com/appengine/docs/python/urlfetch/). This makes running the libary in
+`URL Fetch API <https://developers.google.com/appengine/docs/python/urlfetch/>`_. This makes running the libary in
 GAE's dev_appserver.py easier, and it lets you take advantage of Google's http fetching infrastructure.
 
 Recurly's Python client library is an interface to its `REST API <http://docs.recurly.com/api>`_.
 
 If you are not planning to deploy to GAE, you should use the official
-[Recurly Python Client Library](https://github.com/recurly/recurly-client-python) instead.
+`Recurly Python Client Library <https://github.com/recurly/recurly-client-python>`_ instead.
 
 Usage
 -----
