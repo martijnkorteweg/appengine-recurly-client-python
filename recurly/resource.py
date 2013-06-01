@@ -154,8 +154,8 @@ class Page(list):
 
         """
         page = cls(value)
-        page.record_size = resp.getheader('X-Records')
-        links = parse_link_value(resp.getheader('Link'))
+        page.record_size = resp.header_msg.getheaders('X-Records')[0]        
+        links = parse_link_value(resp.header_msg.getheaders('Link'))
         for url, data in links.iteritems():
             if data.get('rel') == 'start':
                 page.start_url = url
